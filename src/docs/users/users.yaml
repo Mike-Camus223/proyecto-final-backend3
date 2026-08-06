@@ -1,0 +1,87 @@
+paths:
+  /api/users:
+    get:
+      summary: Obtiene todos los usuarios de la aplicación.
+      tags:
+        - Users
+      responses:
+        "200":
+          description: La operación se realizó con éxito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        "500":
+          description: Error del servidor.
+
+  /api/users/{uid}:
+    get:
+      summary: Obtiene un usuario específico por su ID.
+      tags:
+        - Users
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: ID del usuario a obtener.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: La operación se realizó con éxito.
+        "404":
+          description: Usuario no encontrado.
+        "500":
+          description: Error del servidor.
+
+    put:
+      summary: Actualiza un usuario específico por su ID.
+      tags:
+        - Users
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: ID del usuario a actualizar.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "200":
+          description: La operación se realizó con éxito.
+        "500":
+          description: Error del servidor.
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID generado por MongoDB.
+        first_name:
+          type: string
+          description: Nombre del usuario.
+        last_name:
+          type: string
+          description: Apellido del usuario.
+        email:
+          type: string
+          description: Correo electrónico del usuario.
+        password:
+          type: string
+          description: Contraseña encriptada.
+        role:
+          type: string
+          description: Rol del usuario.
+        pets:
+          type: array
+          description: Lista de mascotas del usuario.

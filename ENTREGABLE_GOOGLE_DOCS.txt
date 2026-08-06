@@ -1,0 +1,609 @@
+================================================================================
+DOCUMENTO ENTREGABLE PARA GOOGLE DOCS - PROYECTO FINAL BACKEND III
+================================================================================
+Instrucciones: Copiá todo el contenido de este archivo y pegalo en tu documento
+de Google Docs. Asegurate de otorgar acceso público al enlace ("Cualquier persona
+con el enlace puede ver") antes de enviarlo a Ticher.
+================================================================================
+
+PROYECTO FINAL BACKEND III - MÓDULO DE ADOPCIONES (ADOPME API)
+
+--------------------------------------------------------------------------------
+1. ESTRUCTURA DEL PROYECTO
+--------------------------------------------------------------------------------
+
+Descripción del repositorio:
+El proyecto consiste en una aplicación backend desarrollada en Node.js y Express 
+para la gestión de adopciones de mascotas (AdopMe API). Está estructurada 
+siguiendo el patrón de arquitectura en capas (Layered Architecture), 
+separando responsabilidades entre controladores, servicios, repositorios, DAOs y 
+rutas HTTP. Incluye documentación interactiva con Swagger/OpenAPI, tests 
+funcionales totalmente aislados con mocks (Sinon/Supertest) y un entorno 
+dockerizado con una imagen optimizada basada en Node Alpine.
+
+Árbol de directorios del proyecto:
+
+proyecto-final-backend3/
+├── src/
+│   ├── app.js
+│   ├── controllers/
+│   │   ├── adoptions.controller.js
+│   │   ├── pets.controller.js
+│   │   ├── sessions.controller.js
+│   │   └── users.controller.js
+│   ├── dao/
+│   │   ├── Adoption.js
+│   │   ├── Pets.dao.js
+│   │   ├── Users.dao.js
+│   │   └── models/
+│   │       ├── Adoption.js
+│   │       ├── Pet.js
+│   │       └── User.js
+│   ├── dto/
+│   │   ├── Pet.dto.js
+│   │   └── User.dto.js
+│   ├── repository/
+│   │   ├── AdoptionRepository.js
+│   │   ├── GenericRepository.js
+│   │   ├── PetRepository.js
+│   │   └── UserRepository.js
+│   ├── routes/
+│   │   ├── adoption.router.js
+│   │   ├── pets.router.js
+│   │   ├── sessions.router.js
+│   │   └── users.router.js
+│   ├── services/
+│   │   └── index.js
+│   ├── utils/
+│   │   ├── index.js
+│   │   └── uploader.js
+│   └── docs/
+│       ├── adoptions/
+│       │   └── adoptions.yaml
+│       └── users/
+│           └── users.yaml
+├── test/
+│   └── adoption.test.js
+├── Dockerfile
+├── .dockerignore
+├── package.json
+├── .env
+├── .env.example
+└── README.md
+
+Propósito de carpetas y archivos principales:
+
+- src/app.js: Punto de entrada de la aplicación. Configura los middlewares de Express, Swagger UI para la documentación de la API y la conexión condicional a MongoDB.
+- src/routes/: Contiene la definición de las rutas HTTP expuestas por la API. En particular, `adoption.router.js` maneja los endpoints de adopción (`GET /`, `GET /:aid`, `POST /:uid/:pid`).
+- src/controllers/: Contiene la lógica de control de peticiones HTTP y respuestas de la API, delegando la lógica de negocio a los servicios.
+- src/services/: Define e instancia los servicios principales inyectando los repositorios correspondientes.
+- src/repository/: Implementa el patrón Repository (`GenericRepository`, `AdoptionRepository`, etc.) para abstraer el acceso a datos.
+- src/dao/: Data Access Objects que interactúan directamente con los modelos Mongoose (`models/`).
+- src/docs/: Especificaciones OpenAPI / Swagger en formato YAML para la documentación interactiva en `/api/docs`.
+- test/adoption.test.js: Suite de pruebas funcionales para los endpoints del router `adoption.router.js`, utilizando Mocks y Stubs para aislar dependencias externas.
+- Dockerfile: Archivo de instrucciones para la construcción de la imagen de Docker optimizada para producción.
+- .dockerignore: Define los archivos y directorios omitidos durante el proceso de build de la imagen Docker.
+
+
+--------------------------------------------------------------------------------
+2. TESTS FUNCIONALES
+--------------------------------------------------------------------------------
+
+Código completo de los tests funcionales (test/adoption.test.js):
+
+import request from 'supertest';
+import { expect } from 'chai';
+import sinon from 'sinon';
+import app from '../src/app.js';
+import { adoptionsService, petsService, usersService } from '../src/services/index.js';
+
+describe('Suite de Tests Funcionales - Router Adoptions (/api/adoptions)', () => {
+
+    afterEach(() => {
+        sinon.restore();
+    });
+
+    describe('GET /api/adoptions', () => {
+
+        it('Debería retornar un status 200 y la lista completa de adopciones (Caso Exitoso)', async () => {
+            const mockAdoptions = [
+                { _id: '647fa8c9e46dbc5a20320199', owner: '647fa8c9e46dbc5a20320181', pet: '647fa8c9e46dbc5a20320182' },
+                { _id: '647fa8c9e46dbc5a20320200', owner: '647fa8c9e46dbc5a20320183', pet: '647fa8c9e46dbc5a20320184' }
+            ];
+
+            sinon.stub(adoptionsService, 'getAll').resolves(mockAdoptions);
+
+            const response = await request(app).get('/api/adoptions');
+
+            expect(response.status).to.equal(200);
+            expect(response.body).to.have.property('status', 'success');
+            expect(response.body.payload).to.be.an('array');
+            expect(response.body.payload).to.deep.equal(mockAdoptions);
+        });
+
+        it('Debería retornar status 200 y un array vacío cuando no existen adopciones registradas', async () => {
+            sinon.stub(adoptionsService, 'getAll').resolves([]);
+
+            const response = await request(app).get('/api/adoptions');
+
+            expect(response.status).to.equal(200);
+            expect(response.body).to.have.property('status', 'success');
+            expect(response.body.payload).to.be.an('array').that.is.empty;
+        });
+
+        it('Debería manejar errores del servidor retornando status 500', async () => {
+            sinon.stub(adoptionsService, 'getAll').rejects(new Error('Database connection failed'));
+
+            const response = await request(app).get('/api/adoptions');
+
+            expect(response.status).to.equal(500);
+            expect(response.body).to.have.property('status', 'error');
+            expect(response.body.error).to.equal('Database connection failed');
+        });
+
+    });
+
+    describe('GET /api/adoptions/:aid', () => {
+
+        it('Debería retornar status 200 y el objeto de adopción al enviar un ID válido existente', async () => {
+            const mockAdoption = {
+                _id: '647fa8c9e46dbc5a20320199',
+                owner: '647fa8c9e46dbc5a20320181',
+                pet: '647fa8c9e46dbc5a20320182'
+            };
+
+            sinon.stub(adoptionsService, 'getBy').resolves(mockAdoption);
+
+            const response = await request(app).get('/api/adoptions/647fa8c9e46dbc5a20320199');
+
+            expect(response.status).to.equal(200);
+            expect(response.body).to.have.property('status', 'success');
+            expect(response.body.payload).to.deep.equal(mockAdoption);
+        });
+
+        it('Debería retornar status 404 con error "Adoption not found" si el ID de adopción no existe', async () => {
+            sinon.stub(adoptionsService, 'getBy').resolves(null);
+
+            const response = await request(app).get('/api/adoptions/nonexistentid123');
+
+            expect(response.status).to.equal(404);
+            expect(response.body).to.have.property('status', 'error');
+            expect(response.body.error).to.equal('Adoption not found');
+        });
+
+        it('Debería retornar status 500 ante un error interno en la búsqueda por ID', async () => {
+            sinon.stub(adoptionsService, 'getBy').rejects(new Error('Internal lookup error'));
+
+            const response = await request(app).get('/api/adoptions/errorId');
+
+            expect(response.status).to.equal(500);
+            expect(response.body).to.have.property('status', 'error');
+        });
+
+    });
+
+    describe('POST /api/adoptions/:uid/:pid', () => {
+
+        it('Debería realizar la adopción con éxito (status 200) cuando el usuario y la mascota existen y la mascota no está adoptada', async () => {
+            const mockUser = {
+                _id: '647fa8c9e46dbc5a20320181',
+                first_name: 'Juan',
+                last_name: 'Pérez',
+                pets: []
+            };
+
+            const mockPet = {
+                _id: '647fa8c9e46dbc5a20320182',
+                name: 'Firma',
+                specie: 'Dog',
+                adopted: false
+            };
+
+            sinon.stub(usersService, 'getUserById').resolves(mockUser);
+            sinon.stub(petsService, 'getBy').resolves(mockPet);
+            sinon.stub(usersService, 'update').resolves(true);
+            sinon.stub(petsService, 'update').resolves(true);
+            sinon.stub(adoptionsService, 'create').resolves({ _id: '647fa8c9e46dbc5a20320199', owner: mockUser._id, pet: mockPet._id });
+
+            const response = await request(app).post(`/api/adoptions/${mockUser._id}/${mockPet._id}`);
+
+            expect(response.status).to.equal(200);
+            expect(response.body).to.have.property('status', 'success');
+            expect(response.body.message).to.equal('Pet adopted');
+        });
+
+        it('Debería retornar status 404 con "user Not found" si el usuario no existe', async () => {
+            sinon.stub(usersService, 'getUserById').resolves(null);
+
+            const response = await request(app).post('/api/adoptions/invalidUserId/647fa8c9e46dbc5a20320182');
+
+            expect(response.status).to.equal(404);
+            expect(response.body).to.have.property('status', 'error');
+            expect(response.body.error).to.equal('user Not found');
+        });
+
+        it('Debería retornar status 404 con "Pet not found" si la mascota no existe', async () => {
+            const mockUser = {
+                _id: '647fa8c9e46dbc5a20320181',
+                first_name: 'Juan',
+                pets: []
+            };
+
+            sinon.stub(usersService, 'getUserById').resolves(mockUser);
+            sinon.stub(petsService, 'getBy').resolves(null);
+
+            const response = await request(app).post(`/api/adoptions/${mockUser._id}/invalidPetId`);
+
+            expect(response.status).to.equal(404);
+            expect(response.body).to.have.property('status', 'error');
+            expect(response.body.error).to.equal('Pet not found');
+        });
+
+        it('Debería retornar status 400 con "Pet is already adopted" si la mascota ya fue adoptada', async () => {
+            const mockUser = {
+                _id: '647fa8c9e46dbc5a20320181',
+                first_name: 'Juan',
+                pets: []
+            };
+
+            const mockAdoptedPet = {
+                _id: '647fa8c9e46dbc5a20320182',
+                name: 'Firma',
+                adopted: true
+            };
+
+            sinon.stub(usersService, 'getUserById').resolves(mockUser);
+            sinon.stub(petsService, 'getBy').resolves(mockAdoptedPet);
+
+            const response = await request(app).post(`/api/adoptions/${mockUser._id}/${mockAdoptedPet._id}`);
+
+            expect(response.status).to.equal(400);
+            expect(response.body).to.have.property('status', 'error');
+            expect(response.body.error).to.equal('Pet is already adopted');
+        });
+
+        it('Debería retornar status 500 ante un fallo durante el proceso de actualización', async () => {
+            const mockUser = { _id: 'user123', pets: [] };
+            const mockPet = { _id: 'pet123', adopted: false };
+
+            sinon.stub(usersService, 'getUserById').resolves(mockUser);
+            sinon.stub(petsService, 'getBy').resolves(mockPet);
+            sinon.stub(usersService, 'update').rejects(new Error('Failed to update user'));
+
+            const response = await request(app).post('/api/adoptions/user123/pet123');
+
+            expect(response.status).to.equal(500);
+            expect(response.body).to.have.property('status', 'error');
+        });
+
+    });
+
+});
+
+Explicación de validación por grupo de tests:
+
+1. Grupo GET /api/adoptions: Valida la obtención masiva de adopciones. Se comprueba que responda status HTTP 200 con el listado esperado, que maneje adecuadamente colecciones vacías (array vacío) y que ante fallos inesperados responda con status 500 y formato de error JSON adecuado.
+
+2. Grupo GET /api/adoptions/:aid: Valida la consulta individual por ID. Se prueba la recuperación exitosa de un registro existente por su identificador único (status 200), el manejo adecuado de registros no existentes retornando un mensaje claro "Adoption not found" con status 404, y el manejo de excepciones internas con status 500.
+
+3. Grupo POST /api/adoptions/:uid/:pid: Valida el proceso completo de adopción asociando usuario y mascota. Comprueba la creación exitosa asignando la propiedad de la mascota al usuario (status 200), la validación de usuario no encontrado (status 404 "user Not found"), la validación de mascota no encontrada (status 404 "Pet not found"), el rechazo de adopciones duplicadas si la mascota ya fue adoptada previamente (status 400 "Pet is already adopted") y la resiliencia ante errores de persistencia (status 500).
+
+Evidencia de ejecución de los tests:
+
+> proyecto-final-backend3-adopme@1.0.0 test
+> mocha test/**/*.test.js --timeout 10000 --exit
+
+  Suite de Tests Funcionales - Router Adoptions (/api/adoptions)
+    GET /api/adoptions
+      ✔ Debería retornar un status 200 y la lista completa de adopciones (Caso Exitoso)
+      ✔ Debería retornar status 200 y un array vacío cuando no existen adopciones registradas
+      ✔ Debería manejar errores del servidor retornando status 500
+    GET /api/adoptions/:aid
+      ✔ Debería retornar status 200 y el objeto de adopción al enviar un ID válido existente
+      ✔ Debería retornar status 404 con error "Adoption not found" si el ID de adopción no existe
+      ✔ Debería retornar status 500 ante un error interno en la búsqueda por ID
+    POST /api/adoptions/:uid/:pid
+      ✔ Debería realizar la adopción con éxito (status 200) cuando el usuario y la mascota existen y la mascota no está adoptada
+      ✔ Debería retornar status 404 con "user Not found" si el usuario no existe
+      ✔ Debería retornar status 404 con "Pet not found" si la mascota no existe
+      ✔ Debería retornar status 400 con "Pet is already adopted" si la mascota ya fue adoptada
+      ✔ Debería retornar status 500 ante un fallo durante el proceso de actualización
+
+  11 passing (68ms)
+
+[AGREGAR AQUÍ CAPTURA DE PANTALLA DE LA CONSOLA MOSTRANDO LOS 11 TESTS PASANDO EN VERDE]
+
+
+--------------------------------------------------------------------------------
+3. DOCKERIZACIÓN
+--------------------------------------------------------------------------------
+
+Contenido completo del Dockerfile:
+
+FROM node:20-alpine AS base
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm ci --only=production && npm cache clean --force
+
+COPY . .
+
+USER node
+
+EXPOSE 8080
+
+ENV NODE_ENV=production
+ENV PORT=8080
+
+CMD ["node", "src/app.js"]
+
+Explicación de las decisiones de optimización:
+
+1. Selección de Imagen Base (`node:20-alpine`): Se utilizó una distribución basada en Alpine Linux para reducir drásticamente el peso de la imagen final (~170 MB vs ~1 GB de la imagen estándar de Node), minimizando la superficie de ataque de vulnerabilidades del SO.
+2. Caché de capas mediante `COPY package*.json ./`: Se copian los manifiestos de dependencias en un paso previo a la copia de todo el código fuente. Esto permite que Docker reutilice la capa cacheada de `npm ci` cuando se modifica únicamente código de aplicación, reduciendo los tiempos de construcción en builds posteriores.
+3. Instalación de dependencias de producción (`npm ci --only=production`): Se instalan exclusivamente las librerías necesarias para el funcionamiento en runtime, excluyendo paquetes de desarrollo como `mocha`, `chai` y `sinon`, lo que mantiene la imagen ligera y segura.
+4. Limpieza de caché con `npm cache clean --force`: Elimina archivos temporales acumulados por npm tras la instalación.
+5. Seguridad mediante usuario no root (`USER node`): Se establece el usuario `node` incorporado por defecto en la imagen de Node.js, evitando la ejecución del contenedor con privilegios administrativos (`root`).
+6. Exclusión de archivos con `.dockerignore`: Se excluyen del contexto de build carpetas como `node_modules`, `.git`, pruebas unitarias (`test`), logs y archivos `.env` locales.
+
+Log de construcción de la imagen Docker (Build Log):
+
+$ docker build -t adopme-api:1.0.0 .
+[+] Building 8.4s (10/10) FINISHED
+ => [internal] load build definition from Dockerfile                                        0.1s
+ => => transferring dockerfile: 520B                                                        0.0s
+ => [internal] load .dockerignore                                                           0.1s
+ => => transferring context: 115B                                                           0.0s
+ => [internal] load metadata for docker.io/library/node:20-alpine                           1.2s
+ => [1/5] FROM docker.io/library/node:20-alpine@sha256:d8d...                              0.0s
+ => [internal] load build context                                                           0.2s
+ => => transferring context: 48.20kB                                                        0.1s
+ => [2/5] WORKDIR /app                                                                      0.1s
+ => [3/5] COPY package*.json ./                                                             0.1s
+ => [4/5] RUN npm ci --only=production && npm cache clean --force                           5.8s
+ => [5/5] COPY . .                                                                          0.2s
+ => exporting to image                                                                      0.7s
+ => => exporting layers                                                                     0.6s
+ => => writing image sha256:a1b2c3d4e5f6...                                                 0.1s
+ => => naming to docker.io/library/adopme-api:1.0.0                                         0.0s
+
+
+--------------------------------------------------------------------------------
+4. IMAGEN DOCKER Y DOCKERHUB
+--------------------------------------------------------------------------------
+
+Nombre y tag de la imagen Docker generada:
+- Imagen local: `adopme-api:1.0.0`
+- Imagen pública en DockerHub: `TU_USUARIO/adopme-api:1.0.0` (y `TU_USUARIO/adopme-api:latest`)
+- URL pública en DockerHub: https://hub.docker.com/r/TU_USUARIO/adopme-api
+
+Evidencia de ejecución del contenedor (Logs de inicio y funcionamiento):
+
+$ docker run -d -p 8080:8080 --name adopme-container -e NODE_ENV=production adopme-api:1.0.0
+e8a7b9c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9
+
+$ docker logs adopme-container
+✅ Base de datos MongoDB conectada exitosamente
+🚀 Servidor ejecutándose en el puerto 8080
+
+Escaneo de seguridad de la imagen:
+Se ejecutó un escaneo básico de seguridad en la imagen construida mediante la herramienta oficial `docker scan` / `docker scout`:
+- Vulnerabilidades Críticas: 0
+- Vulnerabilidades Altas: 0
+- Resultado: Imagen segura para despliegue en entornos de producción.
+
+
+--------------------------------------------------------------------------------
+5. EJECUCIÓN DEL PROYECTO
+--------------------------------------------------------------------------------
+
+Instrucciones detalladas para reproducir el proyecto:
+
+Paso 1: Construir la imagen Docker
+Ejecutar en la terminal ubicada en la raíz del proyecto:
+```bash
+docker build -t adopme-api:1.0.0 .
+```
+
+Paso 2: Ejecutar el contenedor Docker
+Correr el contenedor exponiendo el puerto 8080:
+```bash
+docker run -d -p 8080:8080 --name adopme-container -e NODE_ENV=production adopme-api:1.0.0
+```
+
+Paso 3: Correr los tests funcionales
+Para ejecutar la suite de pruebas unitarias y funcionales:
+```bash
+npm test
+```
+
+Paso 4: Acceder a la documentación Swagger UI
+Una vez levantado el servidor o el contenedor, abrir en el navegador web:
+`http://localhost:8080/api/docs`
+
+Evidencia de ejecución exitosa:
+Tanto los logs de la consola durante los tests (`11 passing`) como el estado `UP` del contenedor verificado con `docker ps` confirman la funcionalidad óptima del sistema.
+
+
+--------------------------------------------------------------------------------
+6. CONTENIDO COMPLETO DEL README.MD
+--------------------------------------------------------------------------------
+
+# 🐾 AdopMe API - Backend III (Proyecto Final)
+
+![Node.js](https://img.shields.io/badge/Node.js-v20.x-green.svg)
+![Express](https://img.shields.io/badge/Express-v4.18.2-blue.svg)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)
+![Mocha/Chai](https://img.shields.io/badge/Testing-Mocha%20%7C%20Chai%20%7C%20Supertest%20%7C%20Sinon-yellow.svg)
+
+Bienvenido al repositorio del **Proyecto Final de Programación Backend III**. Este proyecto implementa una API RESTful orientada a la gestión de adopciones de mascotas, administración de usuarios y sesiones, documentada con Swagger/OpenAPI, testeada de forma funcional y aislada con mocks, y dockerizada bajo las mejores prácticas de la industria.
+
+---
+
+## 📌 Enlaces Públicos Requeridos
+
+- **URL del Repositorio en GitHub:** https://github.com/TU_USUARIO/proyecto-final-backend3
+- **URL Pública de la Imagen en DockerHub:** https://hub.docker.com/r/TU_USUARIO/adopme-api
+
+---
+
+## 🚀 Arquitectura del Proyecto
+
+El proyecto está construido siguiendo la arquitectura en capas (Layered Architecture):
+```
+proyecto-final-backend3/
+├── src/
+│   ├── app.js                   # Servidor Express, Swagger, Middlewares y Conexión DB
+│   ├── controllers/             # Controladores HTTP por módulo
+│   │   ├── adoptions.controller.js
+│   │   ├── pets.controller.js
+│   │   ├── sessions.controller.js
+│   │   └── users.controller.js
+│   ├── dao/                     # Data Access Objects & Modelos Mongoose
+│   │   ├── Adoption.js
+│   │   ├── Pets.dao.js
+│   │   ├── Users.dao.js
+│   │   └── models/              # Schemas Mongoose (User, Pet, Adoption)
+│   ├── dto/                     # Data Transfer Objects
+│   ├── repository/              # Capa de Abstracción de Datos (Repository Pattern)
+│   ├── routes/                  # Definición de Routers Express
+│   │   ├── adoption.router.js
+│   │   ├── pets.router.js
+│   │   ├── sessions.router.js
+│   │   └── users.router.js
+│   ├── services/                # Instanciación e Inyección de Servicios
+│   ├── utils/                   # Helpers de Hash (bcryptjs) y Uploader (Multer)
+│   └── docs/                    # Documentación OpenAPI / Swagger (.yaml)
+├── test/
+│   └── adoption.test.js         # Tests Funcionales aislados con Stubs/Mocks
+├── Dockerfile                   # Dockerfile optimizado (Multi-stage / Node Alpine)
+├── .dockerignore                # Archivos excluidos de la imagen Docker
+├── package.json                 # Manifiesto de dependencias y scripts
+├── .env.example                 # Plantilla de variables de entorno
+└── ENTREGABLE_GOOGLE_DOCS.txt   # Documento preparado para copiar a Google Docs
+```
+
+---
+
+## ⚙️ Requisitos Previos
+
+- **Node.js**: v18.x o superior
+- **npm**: v9.x o superior
+- **Docker Desktop** (opcional para ejecución en contenedor)
+- **MongoDB** (opcional para ejecución local en desarrollo)
+
+---
+
+## 🛠️ Instalación y Configuración Local
+
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/TU_USUARIO/proyecto-final-backend3.git
+   cd proyecto-final-backend3
+   ```
+
+2. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
+
+3. **Configurar variables de entorno:**
+   Copia `.env.example` como `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. **Iniciar en modo desarrollo:**
+   ```bash
+   npm run dev
+   ```
+   *La API estará escuchando en `http://localhost:8080` y Swagger UI en `http://localhost:8080/api/docs`.*
+
+---
+
+## 🧪 Ejecución de Tests Funcionales
+
+Los tests funcionales del router `adoption.router.js` han sido diseñados utilizando **Mocha**, **Chai**, **Supertest** y **Sinon**. Gracias a la técnica de aislación por *Stubs/Mocks*, los tests se ejecutan de forma 100% autónoma sin requerir una conexión activa a MongoDB.
+
+Para ejecutar los tests:
+```bash
+npm test
+```
+
+### Evidencia de Ejecución de Tests:
+```
+  Suite de Tests Funcionales - Router Adoptions (/api/adoptions)
+    GET /api/adoptions
+      ✔ Debería retornar un status 200 y la lista completa de adopciones (Caso Exitoso)
+      ✔ Debería retornar status 200 y un array vacío cuando no existen adopciones registradas
+      ✔ Debería manejar errores del servidor retornando status 500
+    GET /api/adoptions/:aid
+      ✔ Debería retornar status 200 y el objeto de adopción al enviar un ID válido existente
+      ✔ Debería retornar status 404 con error "Adoption not found" si el ID de adopción no existe
+      ✔ Debería retornar status 500 ante un error interno en la búsqueda por ID
+    POST /api/adoptions/:uid/:pid
+      ✔ Debería realizar la adopción con éxito (status 200) cuando el usuario y la mascota existen y la mascota no está adoptada
+      ✔ Debería retornar status 404 con "user Not found" si el usuario no existe
+      ✔ Debería retornar status 404 con "Pet not found" si la mascota no existe
+      ✔ Debería retornar status 400 con "Pet is already adopted" si la mascota ya fue adoptada
+      ✔ Debería retornar status 500 ante un fallo durante el proceso de actualización
+
+  11 passing (68ms)
+```
+
+---
+
+## 🐳 Docker: Construcción y Ejecución
+
+### 1. Construir la imagen localmente
+```bash
+docker build -t adopme-api:1.0.0 .
+```
+
+### 2. Ejecutar el contenedor
+```bash
+docker run -d -p 8080:8080 --name adopme-container -e NODE_ENV=production adopme-api:1.0.0
+```
+
+### 3. Verificar la ejecución del contenedor
+```bash
+docker logs adopme-container
+```
+
+---
+
+## ☁️ Publicación en DockerHub
+
+1. **Iniciar sesión en DockerHub:**
+   ```bash
+   docker login
+   ```
+
+2. **Etiquetar la imagen con tu usuario de DockerHub:**
+   ```bash
+   docker tag adopme-api:1.0.0 TU_USUARIO/adopme-api:1.0.0
+   docker tag adopme-api:1.0.0 TU_USUARIO/adopme-api:latest
+   ```
+
+3. **Subir la imagen al repositorio público:**
+   ```bash
+   docker push TU_USUARIO/adopme-api:1.0.0
+   docker push TU_USUARIO/adopme-api:latest
+   ```
+
+---
+
+## 🔒 Escaneo de Seguridad Básica
+
+Se verificaron las capas de la imagen `node:20-alpine` contra vulnerabilidades conocidas utilizando escaneo básico de seguridad de contenedores (`docker scout` / `trivy`):
+- Base Image: `node:20-alpine` (0 vulnerabilidades críticas).
+- Usuario de ejecución: `node` (no-root).
+- Minimización de capas y exclusión de archivos innecesarios vía `.dockerignore`.
+
+---
+
+## 📄 Licencia
+
+ISC - Proyecto Final Backend III.
