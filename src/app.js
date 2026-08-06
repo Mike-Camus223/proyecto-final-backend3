@@ -40,6 +40,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Sanitize URLs to trim trailing newlines or %0A accidentally copied into Postman
+app.use((req, res, next) => {
+    if (req.url) {
+        req.url = req.url.replace(/(%0A|%0D|\r|\n|\s)+$/g, '');
+    }
+    next();
+});
+
 // Routers
 app.use('/api/users', usersRouter);
 app.use('/api/pets', petsRouter);
