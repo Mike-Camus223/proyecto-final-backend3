@@ -5,6 +5,9 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUIExpress from 'swagger-ui-express';
 import dotenv from 'dotenv';
 
+dotenv.config();
+mongoose.set('bufferCommands', false);
+
 import usersRouter from './routes/users.router.js';
 import petsRouter from './routes/pets.router.js';
 import adoptionsRouter from './routes/adoption.router.js';
