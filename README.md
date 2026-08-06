@@ -11,8 +11,8 @@ Bienvenido al repositorio del **Proyecto Final de Programación Backend III**. E
 
 ## 📌 Enlaces Públicos Requeridos
 
-- **URL del Repositorio en GitHub:** [https://github.com/TU_USUARIO/proyecto-final-backend3](https://github.com/TU_USUARIO/proyecto-final-backend3) *(Reemplazar TU_USUARIO por tu nombre de usuario de GitHub)*
-- **URL Pública de la Imagen en DockerHub:** [https://hub.docker.com/r/TU_USUARIO/adopme-api](https://hub.docker.com/r/TU_USUARIO/adopme-api) *(Reemplazar TU_USUARIO por tu nombre de usuario de DockerHub)*
+- **URL del Repositorio en GitHub:** [https://github.com/Mike-Camus223/proyecto-final-backend3](https://github.com/Mike-Camus223/proyecto-final-backend3)
+- **URL Pública de la Imagen en DockerHub:** [https://hub.docker.com/r/mikedev1423/adopme-api](https://hub.docker.com/r/mikedev1423/adopme-api)
 
 ---
 

@@ -376,8 +376,8 @@ $ docker build -t adopme-api:1.0.0 .
 
 Nombre y tag de la imagen Docker generada:
 - Imagen local: `adopme-api:1.0.0`
-- Imagen pública en DockerHub: `TU_USUARIO/adopme-api:1.0.0` (y `TU_USUARIO/adopme-api:latest`)
-- URL pública en DockerHub: https://hub.docker.com/r/TU_USUARIO/adopme-api
+- Imagen pública en DockerHub: `mikedev1423/adopme-api:1.0.0` (y `mikedev1423/adopme-api:latest`)
+- URL pública en DockerHub: https://hub.docker.com/r/mikedev1423/adopme-api
 
 Evidencia de ejecución del contenedor (Logs de inicio y funcionamiento):
 
