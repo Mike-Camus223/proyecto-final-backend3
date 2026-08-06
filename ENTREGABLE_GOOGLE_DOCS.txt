@@ -1,27 +1,16 @@
-================================================================================
-DOCUMENTO ENTREGABLE PARA GOOGLE DOCS - PROYECTO FINAL BACKEND III
-================================================================================
-Instrucciones: Copiá todo el contenido de este archivo y pegalo en tu documento
-de Google Docs. Asegurate de otorgar acceso público al enlace ("Cualquier persona
-con el enlace puede ver") antes de enviarlo a Ticher.
-================================================================================
+proyecto final backend III - documento de entrega
 
-PROYECTO FINAL BACKEND III - MÓDULO DE ADOPCIONES (ADOPME API)
+links publicos del proyecto:
+- repositorio en github: https://github.com/Mike-Camus223/proyecto-final-backend3
+- imagen publica en dockerhub: https://hub.docker.com/r/mikedev1423/adopme-api
 
---------------------------------------------------------------------------------
-1. ESTRUCTURA DEL PROYECTO
---------------------------------------------------------------------------------
 
-Descripción del repositorio:
-El proyecto consiste en una aplicación backend desarrollada en Node.js y Express 
-para la gestión de adopciones de mascotas (AdopMe API). Está estructurada 
-siguiendo el patrón de arquitectura en capas (Layered Architecture), 
-separando responsabilidades entre controladores, servicios, repositorios, DAOs y 
-rutas HTTP. Incluye documentación interactiva con Swagger/OpenAPI, tests 
-funcionales totalmente aislados con mocks (Sinon/Supertest) y un entorno 
-dockerizado con una imagen optimizada basada en Node Alpine.
+1. estructura del proyecto
 
-Árbol de directorios del proyecto:
+descripcion de la estructura:
+el proyecto esta armado sobre una arquitectura en capas para una api de adopcion de mascotas en node.js con express. se dividen las responsabilidades entre controladores, servicios, repositorios y dao para manejar la coneccion con la base de datos mongodb. tambien se sumaron los tests aislados con mocks y la configuracion para dockerizar la aplicacion.
+
+arbol de directorios:
 
 proyecto-final-backend3/
 ├── src/
@@ -67,29 +56,22 @@ proyecto-final-backend3/
 ├── Dockerfile
 ├── .dockerignore
 ├── package.json
-├── .env
-├── .env.example
 └── README.md
 
-Propósito de carpetas y archivos principales:
-
-- src/app.js: Punto de entrada de la aplicación. Configura los middlewares de Express, Swagger UI para la documentación de la API y la conexión condicional a MongoDB.
-- src/routes/: Contiene la definición de las rutas HTTP expuestas por la API. En particular, `adoption.router.js` maneja los endpoints de adopción (`GET /`, `GET /:aid`, `POST /:uid/:pid`).
-- src/controllers/: Contiene la lógica de control de peticiones HTTP y respuestas de la API, delegando la lógica de negocio a los servicios.
-- src/services/: Define e instancia los servicios principales inyectando los repositorios correspondientes.
-- src/repository/: Implementa el patrón Repository (`GenericRepository`, `AdoptionRepository`, etc.) para abstraer el acceso a datos.
-- src/dao/: Data Access Objects que interactúan directamente con los modelos Mongoose (`models/`).
-- src/docs/: Especificaciones OpenAPI / Swagger en formato YAML para la documentación interactiva en `/api/docs`.
-- test/adoption.test.js: Suite de pruebas funcionales para los endpoints del router `adoption.router.js`, utilizando Mocks y Stubs para aislar dependencias externas.
-- Dockerfile: Archivo de instrucciones para la construcción de la imagen de Docker optimizada para producción.
-- .dockerignore: Define los archivos y directorios omitidos durante el proceso de build de la imagen Docker.
+explicacion breve de archivos y carpetas principales:
+- src/app.js: aca arranca el servidor de express, se configuran los middlewares, la ruta de la documentacion de swagger y la coneccion a la base de datos.
+- src/routes/adoption.router.js: contiene los endpoints para obtener y crear adopciones.
+- src/controllers/adoptions.controller.js: maneja la logica de las peticiones que llegan del router de adopciones.
+- src/services/ e index.js: instancian los servicios que conectan los controladores con los repositorios.
+- src/repository/: capa de abstraccion que implementa el patron repository.
+- src/dao/: objetos de acceso a datos que interactuan directo con los esquemas de mongoose.
+- test/adoption.test.js: suite con los tests funcionales para probar los endpoints de adopciones simulando las respuestas de la base de datos.
+- Dockerfile: instrucciones para construir la imagen optimizada de docker.
 
 
---------------------------------------------------------------------------------
-2. TESTS FUNCIONALES
---------------------------------------------------------------------------------
+2. tests funcionales
 
-Código completo de los tests funcionales (test/adoption.test.js):
+codigo completo de los tests funcionales (test/adoption.test.js):
 
 import request from 'supertest';
 import { expect } from 'chai';
@@ -280,15 +262,13 @@ describe('Suite de Tests Funcionales - Router Adoptions (/api/adoptions)', () =>
 
 });
 
-Explicación de validación por grupo de tests:
+explicacion de lo que valida cada grupo de tests:
 
-1. Grupo GET /api/adoptions: Valida la obtención masiva de adopciones. Se comprueba que responda status HTTP 200 con el listado esperado, que maneje adecuadamente colecciones vacías (array vacío) y que ante fallos inesperados responda con status 500 y formato de error JSON adecuado.
+- GET /api/adoptions: testea que se devuelvan todas las adopciones guardadas con estado 200, que responda un array vacio cuando no hay registros, y que devuelva status 500 en caso de falla interna.
+- GET /api/adoptions/:aid: valida buscar una adopcion por su id. chequea que responda 200 con el objeto si existe, 404 si no se encuentra el registro y 500 ante un fallo inesperado.
+- POST /api/adoptions/:uid/:pid: valida el proceso de adopcion. verifica que se cree bien relacionando usuario y mascota (200), que valide si el usuario no existe (404), si la mascota no existe (404) o si la mascota ya habia sido adoptada previamente (400).
 
-2. Grupo GET /api/adoptions/:aid: Valida la consulta individual por ID. Se prueba la recuperación exitosa de un registro existente por su identificador único (status 200), el manejo adecuado de registros no existentes retornando un mensaje claro "Adoption not found" con status 404, y el manejo de excepciones internas con status 500.
-
-3. Grupo POST /api/adoptions/:uid/:pid: Valida el proceso completo de adopción asociando usuario y mascota. Comprueba la creación exitosa asignando la propiedad de la mascota al usuario (status 200), la validación de usuario no encontrado (status 404 "user Not found"), la validación de mascota no encontrada (status 404 "Pet not found"), el rechazo de adopciones duplicadas si la mascota ya fue adoptada previamente (status 400 "Pet is already adopted") y la resiliencia ante errores de persistencia (status 500).
-
-Evidencia de ejecución de los tests:
+evidencia de ejecucion de los tests:
 
 > proyecto-final-backend3-adopme@1.0.0 test
 > mocha test/**/*.test.js --timeout 10000 --exit
@@ -311,14 +291,12 @@ Evidencia de ejecución de los tests:
 
   11 passing (68ms)
 
-[AGREGAR AQUÍ CAPTURA DE PANTALLA DE LA CONSOLA MOSTRANDO LOS 11 TESTS PASANDO EN VERDE]
+[PEGA ACA UNA CAPTURA DE PANTALLA DE TU TERMINAL CORRIENDO NPM TEST CON LOS 11 TESTS EN VERDE]
 
 
---------------------------------------------------------------------------------
-3. DOCKERIZACIÓN
---------------------------------------------------------------------------------
+3. dockerizacion
 
-Contenido completo del Dockerfile:
+contenido completo del dockerfile:
 
 FROM node:20-alpine AS base
 
@@ -339,271 +317,124 @@ ENV PORT=8080
 
 CMD ["node", "src/app.js"]
 
-Explicación de las decisiones de optimización:
+explicacion de decisiones de optimizacion:
+- use la imagen base node:20-alpine por ser super liviana y rápida.
+- copie primero los package.json para aprovechar la memoria cache de docker cuando no cambian las librerias.
+- use npm ci --only=production para instalar solo lo necesario de produccion sin instalar moch o chai.
+- pase el usuario a "USER node" por seguridad para no correr la aplicacion como root.
+- agregue un archivo .dockerignore para evitar copiar carpetas pesadas o innecesarias como node_modules o .git.
 
-1. Selección de Imagen Base (`node:20-alpine`): Se utilizó una distribución basada en Alpine Linux para reducir drásticamente el peso de la imagen final (~170 MB vs ~1 GB de la imagen estándar de Node), minimizando la superficie de ataque de vulnerabilidades del SO.
-2. Caché de capas mediante `COPY package*.json ./`: Se copian los manifiestos de dependencias en un paso previo a la copia de todo el código fuente. Esto permite que Docker reutilice la capa cacheada de `npm ci` cuando se modifica únicamente código de aplicación, reduciendo los tiempos de construcción en builds posteriores.
-3. Instalación de dependencias de producción (`npm ci --only=production`): Se instalan exclusivamente las librerías necesarias para el funcionamiento en runtime, excluyendo paquetes de desarrollo como `mocha`, `chai` y `sinon`, lo que mantiene la imagen ligera y segura.
-4. Limpieza de caché con `npm cache clean --force`: Elimina archivos temporales acumulados por npm tras la instalación.
-5. Seguridad mediante usuario no root (`USER node`): Se establece el usuario `node` incorporado por defecto en la imagen de Node.js, evitando la ejecución del contenedor con privilegios administrativos (`root`).
-6. Exclusión de archivos con `.dockerignore`: Se excluyen del contexto de build carpetas como `node_modules`, `.git`, pruebas unitarias (`test`), logs y archivos `.env` locales.
+log de construccion de la imagen docker:
 
-Log de construcción de la imagen Docker (Build Log):
+$ docker build -t mikedev1423/adopme-api:1.0.0 .
+[+] Building 0.9s (10/10) FINISHED
+ => [internal] load build definition from Dockerfile
+ => [internal] load metadata for docker.io/library/node:20-alpine
+ => [internal] load .dockerignore
+ => [1/5] FROM docker.io/library/node:20-alpine
+ => [2/5] WORKDIR /app
+ => [3/5] COPY package*.json ./
+ => [4/5] RUN npm ci --only=production && npm cache clean --force
+ => [5/5] COPY . .
+ => exporting to image
+ => naming to docker.io/mikedev1423/adopme-api:1.0.0
 
-$ docker build -t adopme-api:1.0.0 .
-[+] Building 8.4s (10/10) FINISHED
- => [internal] load build definition from Dockerfile                                        0.1s
- => => transferring dockerfile: 520B                                                        0.0s
- => [internal] load .dockerignore                                                           0.1s
- => => transferring context: 115B                                                           0.0s
- => [internal] load metadata for docker.io/library/node:20-alpine                           1.2s
- => [1/5] FROM docker.io/library/node:20-alpine@sha256:d8d...                              0.0s
- => [internal] load build context                                                           0.2s
- => => transferring context: 48.20kB                                                        0.1s
- => [2/5] WORKDIR /app                                                                      0.1s
- => [3/5] COPY package*.json ./                                                             0.1s
- => [4/5] RUN npm ci --only=production && npm cache clean --force                           5.8s
- => [5/5] COPY . .                                                                          0.2s
- => exporting to image                                                                      0.7s
- => => exporting layers                                                                     0.6s
- => => writing image sha256:a1b2c3d4e5f6...                                                 0.1s
- => => naming to docker.io/library/adopme-api:1.0.0                                         0.0s
+[PEGA ACA UNA CAPTURA DE PANTALLA DE LA TERMINAL DE VS CODE MOSTRANDO EL ARCHIVO DOCKERFILE]
 
 
---------------------------------------------------------------------------------
-4. IMAGEN DOCKER Y DOCKERHUB
---------------------------------------------------------------------------------
+4. imagen docker
 
-Nombre y tag de la imagen Docker generada:
-- Imagen local: `adopme-api:1.0.0`
-- Imagen pública en DockerHub: `mikedev1423/adopme-api:1.0.0` (y `mikedev1423/adopme-api:latest`)
-- URL pública en DockerHub: https://hub.docker.com/r/mikedev1423/adopme-api
+nombre y tag de la imagen docker:
+- tag de version: mikedev1423/adopme-api:1.0.0
+- tag latest: mikedev1423/adopme-api:latest
+- url publica en dockerhub: https://hub.docker.com/r/mikedev1423/adopme-api
 
-Evidencia de ejecución del contenedor (Logs de inicio y funcionamiento):
+evidencia de subida a dockerhub (log de push):
 
-$ docker run -d -p 8080:8080 --name adopme-container -e NODE_ENV=production adopme-api:1.0.0
-e8a7b9c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9
+$ docker push mikedev1423/adopme-api:1.0.0
+The push refers to repository [docker.io/mikedev1423/adopme-api]
+81f93681ac08: Layer already exists
+56612ca58097: Pushed
+1.0.0: digest: sha256:e24bd34972af204ba24265a9bbc7d48a1d9bf31543b960136c2c0d14eb081bb1 size: 856
 
-$ docker logs adopme-container
-✅ Base de datos MongoDB conectada exitosamente
-🚀 Servidor ejecutándose en el puerto 8080
+$ docker push mikedev1423/adopme-api:latest
+The push refers to repository [docker.io/mikedev1423/adopme-api]
+latest: digest: sha256:e24bd34972af204ba24265a9bbc7d48a1d9bf31543b960136c2c0d14eb081bb1 size: 856
 
-Escaneo de seguridad de la imagen:
-Se ejecutó un escaneo básico de seguridad en la imagen construida mediante la herramienta oficial `docker scan` / `docker scout`:
-- Vulnerabilidades Críticas: 0
-- Vulnerabilidades Altas: 0
-- Resultado: Imagen segura para despliegue en entornos de producción.
+[PEGA ACA UNA CAPTURA DE PANTALLA DE LA TERMINAL DONDE SE VE EL DOCKER PUSH EXITOSO]
 
 
---------------------------------------------------------------------------------
-5. EJECUCIÓN DEL PROYECTO
---------------------------------------------------------------------------------
+5. ejecucion del proyecto
 
-Instrucciones detalladas para reproducir el proyecto:
+instrucciones para probar el proyecto:
 
-Paso 1: Construir la imagen Docker
-Ejecutar en la terminal ubicada en la raíz del proyecto:
-```bash
-docker build -t adopme-api:1.0.0 .
-```
+1. clonar el repositorio de github:
+git clone https://github.com/Mike-Camus223/proyecto-final-backend3.git
+cd proyecto-final-backend3
 
-Paso 2: Ejecutar el contenedor Docker
-Correr el contenedor exponiendo el puerto 8080:
-```bash
-docker run -d -p 8080:8080 --name adopme-container -e NODE_ENV=production adopme-api:1.0.0
-```
-
-Paso 3: Correr los tests funcionales
-Para ejecutar la suite de pruebas unitarias y funcionales:
-```bash
+2. instalar dependencias y ejecutar tests:
+npm install
 npm test
-```
 
-Paso 4: Acceder a la documentación Swagger UI
-Una vez levantado el servidor o el contenedor, abrir en el navegador web:
-`http://localhost:8080/api/docs`
+3. armar la imagen docker localmente:
+docker build -t mikedev1423/adopme-api:1.0.0 .
 
-Evidencia de ejecución exitosa:
-Tanto los logs de la consola durante los tests (`11 passing`) como el estado `UP` del contenedor verificado con `docker ps` confirman la funcionalidad óptima del sistema.
+4. correr el contenedor:
+docker run -d -p 8080:8080 --name adopme-container mikedev1423/adopme-api:1.0.0
 
-
---------------------------------------------------------------------------------
-6. CONTENIDO COMPLETO DEL README.MD
---------------------------------------------------------------------------------
-
-# 🐾 AdopMe API - Backend III (Proyecto Final)
-
-![Node.js](https://img.shields.io/badge/Node.js-v20.x-green.svg)
-![Express](https://img.shields.io/badge/Express-v4.18.2-blue.svg)
-![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)
-![Mocha/Chai](https://img.shields.io/badge/Testing-Mocha%20%7C%20Chai%20%7C%20Supertest%20%7C%20Sinon-yellow.svg)
-
-Bienvenido al repositorio del **Proyecto Final de Programación Backend III**. Este proyecto implementa una API RESTful orientada a la gestión de adopciones de mascotas, administración de usuarios y sesiones, documentada con Swagger/OpenAPI, testeada de forma funcional y aislada con mocks, y dockerizada bajo las mejores prácticas de la industria.
-
----
-
-## 📌 Enlaces Públicos Requeridos
-
-- **URL del Repositorio en GitHub:** https://github.com/TU_USUARIO/proyecto-final-backend3
-- **URL Pública de la Imagen en DockerHub:** https://hub.docker.com/r/TU_USUARIO/adopme-api
-
----
-
-## 🚀 Arquitectura del Proyecto
-
-El proyecto está construido siguiendo la arquitectura en capas (Layered Architecture):
-```
-proyecto-final-backend3/
-├── src/
-│   ├── app.js                   # Servidor Express, Swagger, Middlewares y Conexión DB
-│   ├── controllers/             # Controladores HTTP por módulo
-│   │   ├── adoptions.controller.js
-│   │   ├── pets.controller.js
-│   │   ├── sessions.controller.js
-│   │   └── users.controller.js
-│   ├── dao/                     # Data Access Objects & Modelos Mongoose
-│   │   ├── Adoption.js
-│   │   ├── Pets.dao.js
-│   │   ├── Users.dao.js
-│   │   └── models/              # Schemas Mongoose (User, Pet, Adoption)
-│   ├── dto/                     # Data Transfer Objects
-│   ├── repository/              # Capa de Abstracción de Datos (Repository Pattern)
-│   ├── routes/                  # Definición de Routers Express
-│   │   ├── adoption.router.js
-│   │   ├── pets.router.js
-│   │   ├── sessions.router.js
-│   │   └── users.router.js
-│   ├── services/                # Instanciación e Inyección de Servicios
-│   ├── utils/                   # Helpers de Hash (bcryptjs) y Uploader (Multer)
-│   └── docs/                    # Documentación OpenAPI / Swagger (.yaml)
-├── test/
-│   └── adoption.test.js         # Tests Funcionales aislados con Stubs/Mocks
-├── Dockerfile                   # Dockerfile optimizado (Multi-stage / Node Alpine)
-├── .dockerignore                # Archivos excluidos de la imagen Docker
-├── package.json                 # Manifiesto de dependencias y scripts
-├── .env.example                 # Plantilla de variables de entorno
-└── ENTREGABLE_GOOGLE_DOCS.txt   # Documento preparado para copiar a Google Docs
-```
-
----
-
-## ⚙️ Requisitos Previos
-
-- **Node.js**: v18.x o superior
-- **npm**: v9.x o superior
-- **Docker Desktop** (opcional para ejecución en contenedor)
-- **MongoDB** (opcional para ejecución local en desarrollo)
-
----
-
-## 🛠️ Instalación y Configuración Local
-
-1. **Clonar el repositorio:**
-   ```bash
-   git clone https://github.com/TU_USUARIO/proyecto-final-backend3.git
-   cd proyecto-final-backend3
-   ```
-
-2. **Instalar dependencias:**
-   ```bash
-   npm install
-   ```
-
-3. **Configurar variables de entorno:**
-   Copia `.env.example` como `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-
-4. **Iniciar en modo desarrollo:**
-   ```bash
-   npm run dev
-   ```
-   *La API estará escuchando en `http://localhost:8080` y Swagger UI en `http://localhost:8080/api/docs`.*
-
----
-
-## 🧪 Ejecución de Tests Funcionales
-
-Los tests funcionales del router `adoption.router.js` han sido diseñados utilizando **Mocha**, **Chai**, **Supertest** y **Sinon**. Gracias a la técnica de aislación por *Stubs/Mocks*, los tests se ejecutan de forma 100% autónoma sin requerir una conexión activa a MongoDB.
-
-Para ejecutar los tests:
-```bash
-npm test
-```
-
-### Evidencia de Ejecución de Tests:
-```
-  Suite de Tests Funcionales - Router Adoptions (/api/adoptions)
-    GET /api/adoptions
-      ✔ Debería retornar un status 200 y la lista completa de adopciones (Caso Exitoso)
-      ✔ Debería retornar status 200 y un array vacío cuando no existen adopciones registradas
-      ✔ Debería manejar errores del servidor retornando status 500
-    GET /api/adoptions/:aid
-      ✔ Debería retornar status 200 y el objeto de adopción al enviar un ID válido existente
-      ✔ Debería retornar status 404 con error "Adoption not found" si el ID de adopción no existe
-      ✔ Debería retornar status 500 ante un error interno en la búsqueda por ID
-    POST /api/adoptions/:uid/:pid
-      ✔ Debería realizar la adopción con éxito (status 200) cuando el usuario y la mascota existen y la mascota no está adoptada
-      ✔ Debería retornar status 404 con "user Not found" si el usuario no existe
-      ✔ Debería retornar status 404 con "Pet not found" si la mascota no existe
-      ✔ Debería retornar status 400 con "Pet is already adopted" si la mascota ya fue adoptada
-      ✔ Debería retornar status 500 ante un fallo durante el proceso de actualización
-
-  11 passing (68ms)
-```
-
----
-
-## 🐳 Docker: Construcción y Ejecución
-
-### 1. Construir la imagen localmente
-```bash
-docker build -t adopme-api:1.0.0 .
-```
-
-### 2. Ejecutar el contenedor
-```bash
-docker run -d -p 8080:8080 --name adopme-container -e NODE_ENV=production adopme-api:1.0.0
-```
-
-### 3. Verificar la ejecución del contenedor
-```bash
+5. ver los logs del servidor corriendo:
 docker logs adopme-container
-```
 
----
+[PEGA ACA UNA CAPTURA DE PANTALLA DE DOCKER DESKTOP O LA TERMINAL CON EL CONTENEDOR EN MARCHA]
 
-## ☁️ Publicación en DockerHub
 
-1. **Iniciar sesión en DockerHub:**
-   ```bash
-   docker login
-   ```
+6. readme completado
 
-2. **Etiquetar la imagen con tu usuario de DockerHub:**
-   ```bash
-   docker tag adopme-api:1.0.0 TU_USUARIO/adopme-api:1.0.0
-   docker tag adopme-api:1.0.0 TU_USUARIO/adopme-api:latest
-   ```
+# proyecto final backend III - adopme api
 
-3. **Subir la imagen al repositorio público:**
-   ```bash
-   docker push TU_USUARIO/adopme-api:1.0.0
-   docker push TU_USUARIO/adopme-api:latest
-   ```
+este es el proyecto final para la materia de backend 3. consiste en una api en nodejs y express para la gestion de adopciones de mascotas, usuarios y sesiones. cuenta con documentacion swagger, pruebas funcionales con mocks y una imagen docker optimizada.
 
----
+## links de la entrega
 
-## 🔒 Escaneo de Seguridad Básica
+- repo de github: https://github.com/Mike-Camus223/proyecto-final-backend3
+- imagen en dockerhub: https://hub.docker.com/r/mikedev1423/adopme-api
 
-Se verificaron las capas de la imagen `node:20-alpine` contra vulnerabilidades conocidas utilizando escaneo básico de seguridad de contenedores (`docker scout` / `trivy`):
-- Base Image: `node:20-alpine` (0 vulnerabilidades críticas).
-- Usuario de ejecución: `node` (no-root).
-- Minimización de capas y exclusión de archivos innecesarios vía `.dockerignore`.
+## estructura basica
 
----
+- src/app.js: entrada principal de la app express y conexion a mongodb.
+- src/routes/adoption.router.js: las rutas para ver y crear adopciones.
+- src/controllers/: la logica de las peticiones para adopciones, usuarios y mascotas.
+- src/services/ y src/repository/: capa de servicios y repositorios.
+- src/dao/: acceso a la base de datos con los modelos de mongoose.
+- test/adoption.test.js: los tests funcionales hechos con mocha, chai, supertest y sinon.
+- Dockerfile: el archivo para armar la imagen ligera del proyecto.
 
-## 📄 Licencia
+## como ejecutar el proyecto localmente
 
-ISC - Proyecto Final Backend III.
+1. clonar el repo e instalar dependencias:
+npm install
+
+2. crear el archivo .env basandote en el .env.example
+
+3. levantar el servidor en modo desarrollo:
+npm run dev
+
+la api queda corriendo en http://localhost:8080 y la documentacion de swagger la podes ver en http://localhost:8080/api/docs
+
+## como correr los tests funcionales
+
+para probar las rutas de adopcion con los mocks (sin usar la base de datos real):
+npm test
+
+## como construir y correr en docker
+
+1. construir la imagen:
+docker build -t mikedev1423/adopme-api:1.0.0 .
+
+2. correr el contenedor:
+docker run -d -p 8080:8080 --name adopme-container mikedev1423/adopme-api:1.0.0
+
+3. subir la imagen a dockerhub:
+docker push mikedev1423/adopme-api:1.0.0
+docker tag mikedev1423/adopme-api:1.0.0 mikedev1423/adopme-api:latest
+docker push mikedev1423/adopme-api:latest
