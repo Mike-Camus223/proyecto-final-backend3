@@ -1,8 +1,3 @@
-# ==============================================================================
-# Dockerfile Optimizado para AdopMe API - Backend III
-# Base Image: Node 20 Alpine (ultra ligera y orientada a producción)
-# ==============================================================================
-
 FROM node:20-alpine AS base
 
 # Definición del directorio de trabajo

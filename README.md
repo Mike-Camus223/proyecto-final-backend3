@@ -1,11 +1,11 @@
-# Proyecto final backend III - adopme api
+# Proyecto final backend III - patitas api
 
 este es el proyecto final para la materia de backend 3. consiste en una api en nodejs y express para la gestion de adopciones de mascotas, usuarios y sesiones. cuenta con documentacion swagger, pruebas funcionales con mocks y una imagen docker optimizada.
 
 ## links de la entrega
 
 - repo de github: https://github.com/Mike-Camus223/proyecto-final-backend3
-- imagen en dockerhub: https://hub.docker.com/r/mikedev1423/adopme-api
+- imagen en dockerhub: https://hub.docker.com/r/mikedev1423/patitas-api
 
 ## estructura basica
 
@@ -37,12 +37,12 @@ npm test
 ## como construir y correr en docker
 
 1. construir la imagen:
-docker build -t mikedev1423/adopme-api:1.0.0 .
+docker build -t mikedev1423/patitas-api:1.0.0 .
 
 2. correr el contenedor:
-docker run -d -p 8080:8080 --name adopme-container mikedev1423/adopme-api:1.0.0
+docker run -d -p 8080:8080 --name patitas-container mikedev1423/patitas-api:1.0.0
 
 3. subir la imagen a dockerhub:
-docker push mikedev1423/adopme-api:1.0.0
-docker tag mikedev1423/adopme-api:1.0.0 mikedev1423/adopme-api:latest
-docker push mikedev1423/adopme-api:latest
+docker push mikedev1423/patitas-api:1.0.0
+docker tag mikedev1423/patitas-api:1.0.0 mikedev1423/patitas-api:latest
+docker push mikedev1423/patitas-api:latest

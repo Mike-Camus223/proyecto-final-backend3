@@ -57,7 +57,7 @@ const isMochaRunning = process.argv.some(arg => String(arg).includes('mocha'));
 if (process.env.NODE_ENV !== 'test' && !isMochaRunning) {
     app.listen(PORT, () => console.log(`Servidor ejecutandose en el puerto ${PORT}`));
     
-    const MONGO_URI = process.env.DATABASE || 'mongodb://localhost:27017/adopme';
+    const MONGO_URI = process.env.DATABASE || 'mongodb://localhost:27017/patitas';
     mongoose.connect(MONGO_URI)
         .then(() => {
             console.log('Base de datos MongoDB conectada exitosamente');

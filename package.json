@@ -1,7 +1,7 @@
 {
-  "name": "proyecto-final-backend3-adopme",
+  "name": "proyecto-final-backend3-patitas",
   "version": "1.0.0",
-  "description": "API REST para gestión de adopciones de mascotas - Proyecto Final Backend III",
+  "description": "API REST para gestión de adopciones de mascotas - Patitas API - Backend III",
   "main": "src/app.js",
   "type": "module",
   "scripts": {

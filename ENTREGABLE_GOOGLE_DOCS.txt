@@ -2,7 +2,7 @@ proyecto final backend III - documento de entrega
 
 links publicos del proyecto:
 - repositorio en github: https://github.com/Mike-Camus223/proyecto-final-backend3
-- imagen publica en dockerhub: https://hub.docker.com/r/mikedev1423/adopme-api
+- imagen publica en dockerhub: https://hub.docker.com/r/mikedev1423/patitas-api
 
 
 1. estructura del proyecto
@@ -270,7 +270,7 @@ explicacion de lo que valida cada grupo de tests:
 
 evidencia de ejecucion de los tests:
 
-> proyecto-final-backend3-adopme@1.0.0 test
+> proyecto-final-backend3-patitas@1.0.0 test
 > mocha test/**/*.test.js --timeout 10000 --exit
 
   Suite de Tests Funcionales - Router Adoptions (/api/adoptions)
@@ -326,7 +326,7 @@ explicacion de decisiones de optimizacion:
 
 log de construccion de la imagen docker:
 
-$ docker build -t mikedev1423/adopme-api:1.0.0 .
+$ docker build -t mikedev1423/patitas-api:1.0.0 .
 [+] Building 0.9s (10/10) FINISHED
  => [internal] load build definition from Dockerfile
  => [internal] load metadata for docker.io/library/node:20-alpine
@@ -337,7 +337,7 @@ $ docker build -t mikedev1423/adopme-api:1.0.0 .
  => [4/5] RUN npm ci --only=production && npm cache clean --force
  => [5/5] COPY . .
  => exporting to image
- => naming to docker.io/mikedev1423/adopme-api:1.0.0
+ => naming to docker.io/mikedev1423/patitas-api:1.0.0
 
 [PEGA ACA UNA CAPTURA DE PANTALLA DE LA TERMINAL DE VS CODE MOSTRANDO EL ARCHIVO DOCKERFILE]
 
@@ -345,20 +345,20 @@ $ docker build -t mikedev1423/adopme-api:1.0.0 .
 4. imagen docker
 
 nombre y tag de la imagen docker:
-- tag de version: mikedev1423/adopme-api:1.0.0
-- tag latest: mikedev1423/adopme-api:latest
-- url publica en dockerhub: https://hub.docker.com/r/mikedev1423/adopme-api
+- tag de version: mikedev1423/patitas-api:1.0.0
+- tag latest: mikedev1423/patitas-api:latest
+- url publica en dockerhub: https://hub.docker.com/r/mikedev1423/patitas-api
 
 evidencia de subida a dockerhub (log de push):
 
-$ docker push mikedev1423/adopme-api:1.0.0
-The push refers to repository [docker.io/mikedev1423/adopme-api]
+$ docker push mikedev1423/patitas-api:1.0.0
+The push refers to repository [docker.io/mikedev1423/patitas-api]
 81f93681ac08: Layer already exists
 56612ca58097: Pushed
 1.0.0: digest: sha256:e24bd34972af204ba24265a9bbc7d48a1d9bf31543b960136c2c0d14eb081bb1 size: 856
 
-$ docker push mikedev1423/adopme-api:latest
-The push refers to repository [docker.io/mikedev1423/adopme-api]
+$ docker push mikedev1423/patitas-api:latest
+The push refers to repository [docker.io/mikedev1423/patitas-api]
 latest: digest: sha256:e24bd34972af204ba24265a9bbc7d48a1d9bf31543b960136c2c0d14eb081bb1 size: 856
 
 [PEGA ACA UNA CAPTURA DE PANTALLA DE LA TERMINAL DONDE SE VE EL DOCKER PUSH EXITOSO]
@@ -377,27 +377,27 @@ npm install
 npm test
 
 3. armar la imagen docker localmente:
-docker build -t mikedev1423/adopme-api:1.0.0 .
+docker build -t mikedev1423/patitas-api:1.0.0 .
 
 4. correr el contenedor:
-docker run -d -p 8080:8080 --name adopme-container mikedev1423/adopme-api:1.0.0
+docker run -d -p 8080:8080 --name patitas-container mikedev1423/patitas-api:1.0.0
 
 5. ver los logs del servidor corriendo:
-docker logs adopme-container
+docker logs patitas-container
 
 [PEGA ACA UNA CAPTURA DE PANTALLA DE DOCKER DESKTOP O LA TERMINAL CON EL CONTENEDOR EN MARCHA]
 
 
 6. readme completado
 
-# proyecto final backend III - adopme api
+# proyecto final backend III - patitas api
 
 este es el proyecto final para la materia de backend 3. consiste en una api en nodejs y express para la gestion de adopciones de mascotas, usuarios y sesiones. cuenta con documentacion swagger, pruebas funcionales con mocks y una imagen docker optimizada.
 
 ## links de la entrega
 
 - repo de github: https://github.com/Mike-Camus223/proyecto-final-backend3
-- imagen en dockerhub: https://hub.docker.com/r/mikedev1423/adopme-api
+- imagen en dockerhub: https://hub.docker.com/r/mikedev1423/patitas-api
 
 ## estructura basica
 
@@ -429,12 +429,12 @@ npm test
 ## como construir y correr en docker
 
 1. construir la imagen:
-docker build -t mikedev1423/adopme-api:1.0.0 .
+docker build -t mikedev1423/patitas-api:1.0.0 .
 
 2. correr el contenedor:
-docker run -d -p 8080:8080 --name adopme-container mikedev1423/adopme-api:1.0.0
+docker run -d -p 8080:8080 --name patitas-container mikedev1423/patitas-api:1.0.0
 
 3. subir la imagen a dockerhub:
-docker push mikedev1423/adopme-api:1.0.0
-docker tag mikedev1423/adopme-api:1.0.0 mikedev1423/adopme-api:latest
-docker push mikedev1423/adopme-api:latest
+docker push mikedev1423/patitas-api:1.0.0
+docker tag mikedev1423/patitas-api:1.0.0 mikedev1423/patitas-api:latest
+docker push mikedev1423/patitas-api:latest
