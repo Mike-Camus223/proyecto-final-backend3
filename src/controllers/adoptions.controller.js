@@ -1,17 +1,11 @@
 import { adoptionsService, petsService, usersService } from "../services/index.js";
 
-const sampleAdoptions = [
-    { _id: "647fa8c9e46dbc5a20320199", owner: "647fa8c9e46dbc5a20320181", pet: "647fa8c9e46dbc5a20320182" },
-    { _id: "647fa8c9e46dbc5a20320200", owner: "647fa8c9e46dbc5a20320183", pet: "647fa8c9e46dbc5a20320184" }
-];
-
 const getAllAdoptions = async (req, res) => {
     try {
         const result = await adoptionsService.getAll();
         res.send({ status: "success", payload: result });
     } catch (error) {
-        // Fallback a datos mock si MongoDB local no esta activo
-        res.send({ status: "success", payload: sampleAdoptions });
+        res.status(500).send({ status: "error", error: error.message });
     }
 };
 
@@ -19,17 +13,10 @@ const getAdoption = async (req, res) => {
     try {
         const adoptionId = req.params.aid;
         const adoption = await adoptionsService.getBy({ _id: adoptionId });
-        if (!adoption) {
-            const foundMock = sampleAdoptions.find(a => a._id === adoptionId);
-            if (foundMock) return res.send({ status: "success", payload: foundMock });
-            return res.status(404).send({ status: "error", error: "Adoption not found" });
-        }
+        if (!adoption) return res.status(404).send({ status: "error", error: "Adoption not found" });
         res.send({ status: "success", payload: adoption });
     } catch (error) {
-        const adoptionId = req.params.aid;
-        const foundMock = sampleAdoptions.find(a => a._id === adoptionId);
-        if (foundMock) return res.send({ status: "success", payload: foundMock });
-        res.status(404).send({ status: "error", error: "Adoption not found" });
+        res.status(500).send({ status: "error", error: error.message });
     }
 };
 
@@ -52,7 +39,7 @@ const createAdoption = async (req, res) => {
         
         res.send({ status: "success", message: "Pet adopted" });
     } catch (error) {
-        res.send({ status: "success", message: "Pet adopted" });
+        res.status(500).send({ status: "error", error: error.message });
     }
 };
 

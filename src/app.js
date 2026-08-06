@@ -4,8 +4,9 @@ import cookieParser from 'cookie-parser';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUIExpress from 'swagger-ui-express';
 import dotenv from 'dotenv';
-
+const isTest = process.env.NODE_ENV === 'test';
 dotenv.config();
+if (isTest) process.env.NODE_ENV = 'test';
 mongoose.set('bufferCommands', false);
 
 import usersRouter from './routes/users.router.js';
@@ -46,7 +47,8 @@ app.use('/api/adoptions', adoptionsRouter);
 app.use('/api/sessions', sessionsRouter);
 
 // Database Connection & Server Listener (Skip during automated tests)
-if (process.env.NODE_ENV !== 'test') {
+const isMochaRunning = process.argv.some(arg => String(arg).includes('mocha'));
+if (process.env.NODE_ENV !== 'test' && !isMochaRunning) {
     app.listen(PORT, () => console.log(`Servidor ejecutandose en el puerto ${PORT}`));
     
     const MONGO_URI = process.env.DATABASE || 'mongodb://localhost:27017/adopme';
