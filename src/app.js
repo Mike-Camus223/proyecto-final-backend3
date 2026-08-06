@@ -4,17 +4,15 @@ import cookieParser from 'cookie-parser';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUIExpress from 'swagger-ui-express';
 import dotenv from 'dotenv';
+
 const isTest = process.env.NODE_ENV === 'test';
 dotenv.config();
 if (isTest) process.env.NODE_ENV = 'test';
-mongoose.set('bufferCommands', false);
 
 import usersRouter from './routes/users.router.js';
 import petsRouter from './routes/pets.router.js';
 import adoptionsRouter from './routes/adoption.router.js';
 import sessionsRouter from './routes/sessions.router.js';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8080;
