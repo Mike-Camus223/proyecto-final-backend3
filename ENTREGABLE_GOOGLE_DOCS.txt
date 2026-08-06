@@ -291,7 +291,7 @@ evidencia de ejecucion de los tests:
 
   11 passing (68ms)
 
-[PEGA ACA UNA CAPTURA DE PANTALLA DE TU TERMINAL CORRIENDO NPM TEST CON LOS 11 TESTS EN VERDE]
+>>> [PONER AQUÍ IMAGEN 1: CAPTURA DE PANTALLA DE LA CONSOLA CORRIENDO NPM TEST CON LOS 11 TESTS PASANDO EN VERDE] <<<
 
 
 3. dockerizacion
@@ -339,7 +339,7 @@ $ docker build -t mikedev1423/patitas-api:1.0.0 .
  => exporting to image
  => naming to docker.io/mikedev1423/patitas-api:1.0.0
 
-[PEGA ACA UNA CAPTURA DE PANTALLA DE LA TERMINAL DE VS CODE MOSTRANDO EL ARCHIVO DOCKERFILE]
+>>> [PONER AQUÍ IMAGEN 2: CAPTURA DE PANTALLA DEL EDITOR VS CODE CON EL ARCHIVO DOCKERFILE ABIERTO] <<<
 
 
 4. imagen docker
@@ -359,9 +359,9 @@ The push refers to repository [docker.io/mikedev1423/patitas-api]
 
 $ docker push mikedev1423/patitas-api:latest
 The push refers to repository [docker.io/mikedev1423/patitas-api]
-latest: digest: sha256:e24bd34972af204ba24265a9bbc7d48a1d9bf31543b960136c2c0d14eb081bb1 size: 856
+latest: digest: sha256:fcb71cb8e161dc7257a5e9ad8e95a2ab2fd46881c69742f4e04783fd61042583 size: 856
 
-[PEGA ACA UNA CAPTURA DE PANTALLA DE LA TERMINAL DONDE SE VE EL DOCKER PUSH EXITOSO]
+>>> [PONER AQUÍ IMAGEN 3: CAPTURA DE PANTALLA DE DOCKERHUB O TERMINAL MOSTRANDO EL DOCKER PUSH EXITOSO] <<<
 
 
 5. ejecucion del proyecto
@@ -385,7 +385,7 @@ docker run -d -p 8080:8080 --name patitas-container mikedev1423/patitas-api:1.0.
 5. ver los logs del servidor corriendo:
 docker logs patitas-container
 
-[PEGA ACA UNA CAPTURA DE PANTALLA DE DOCKER DESKTOP O LA TERMINAL CON EL CONTENEDOR EN MARCHA]
+>>> [PONER AQUÍ IMAGEN 4: CAPTURA DE PANTALLA DE SWAGGER UI EN HTTP://LOCALHOST:8080/API/DOCS O DOCKER DESKTOP EN MARCHA] <<<
 
 
 6. readme completado
