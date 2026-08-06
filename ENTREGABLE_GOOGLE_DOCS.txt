@@ -275,19 +275,19 @@ evidencia de ejecucion de los tests:
 
   Suite de Tests Funcionales - Router Adoptions (/api/adoptions)
     GET /api/adoptions
-      ✔ Debería retornar un status 200 y la lista completa de adopciones (Caso Exitoso)
-      ✔ Debería retornar status 200 y un array vacío cuando no existen adopciones registradas
-      ✔ Debería manejar errores del servidor retornando status 500
+      + Debería retornar un status 200 y la lista completa de adopciones (Caso Exitoso)
+      + Debería retornar status 200 y un array vacío cuando no existen adopciones registradas
+      + Debería manejar errores del servidor retornando status 500
     GET /api/adoptions/:aid
-      ✔ Debería retornar status 200 y el objeto de adopción al enviar un ID válido existente
-      ✔ Debería retornar status 404 con error "Adoption not found" si el ID de adopción no existe
-      ✔ Debería retornar status 500 ante un error interno en la búsqueda por ID
+      + Debería retornar status 200 y el objeto de adopción al enviar un ID válido existente
+      + Debería retornar status 404 con error "Adoption not found" si el ID de adopción no existe
+      + Debería retornar status 500 ante un error interno en la búsqueda por ID
     POST /api/adoptions/:uid/:pid
-      ✔ Debería realizar la adopción con éxito (status 200) cuando el usuario y la mascota existen y la mascota no está adoptada
-      ✔ Debería retornar status 404 con "user Not found" si el usuario no existe
-      ✔ Debería retornar status 404 con "Pet not found" si la mascota no existe
-      ✔ Debería retornar status 400 con "Pet is already adopted" si la mascota ya fue adoptada
-      ✔ Debería retornar status 500 ante un fallo durante el proceso de actualización
+      + Debería realizar la adopción con éxito (status 200) cuando el usuario y la mascota existen y la mascota no está adoptada
+      + Debería retornar status 404 con "user Not found" si el usuario no existe
+      + Debería retornar status 404 con "Pet not found" si la mascota no existe
+      + Debería retornar status 400 con "Pet is already adopted" si la mascota ya fue adoptada
+      + Debería retornar status 500 ante un fallo durante el proceso de actualización
 
   11 passing (68ms)
 
