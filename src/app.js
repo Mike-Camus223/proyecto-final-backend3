@@ -22,8 +22,8 @@ const swaggerOptions = {
     definition: {
         openapi: '3.0.1',
         info: {
-            title: 'AdopMe API - Backend III',
-            description: 'API RESTful para la gestión de adopciones de mascotas y administración de usuarios.',
+            title: 'Patitas API - Backend III',
+            description: 'API RESTful para la gestion de adopciones de mascotas (perros y gatos) y administracion de usuarios.',
             version: '1.0.0'
         }
     },

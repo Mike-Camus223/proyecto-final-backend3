@@ -2,8 +2,16 @@ import mongoose from "mongoose";
 import adoptionModel from "./models/Adoption.js";
 
 const sampleAdoptions = [
-    { _id: "647fa8c9e46dbc5a20320199", owner: "647fa8c9e46dbc5a20320181", pet: "647fa8c9e46dbc5a20320182" },
-    { _id: "647fa8c9e46dbc5a20320200", owner: "647fa8c9e46dbc5a20320183", pet: "647fa8c9e46dbc5a20320184" }
+    {
+        _id: "647fa8c9e46dbc5a20320199",
+        owner: "647fa8c9e46dbc5a20320181",
+        pet: "647fa8c9e46dbc5a20320185"
+    },
+    {
+        _id: "647fa8c9e46dbc5a20320200",
+        owner: "647fa8c9e46dbc5a20320183",
+        pet: "647fa8c9e46dbc5a20320188"
+    }
 ];
 
 export default class Adoption {

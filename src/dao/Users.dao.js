@@ -8,6 +8,38 @@ const sampleUsers = [
         last_name: "Perez",
         email: "juan.perez@example.com",
         role: "user",
+        pets: [{ _id: "647fa8c9e46dbc5a20320185" }]
+    },
+    {
+        _id: "647fa8c9e46dbc5a20320183",
+        first_name: "Maria",
+        last_name: "Gomez",
+        email: "maria.gomez@example.com",
+        role: "user",
+        pets: [{ _id: "647fa8c9e46dbc5a20320188" }]
+    },
+    {
+        _id: "647fa8c9e46dbc5a20320190",
+        first_name: "Carlos",
+        last_name: "Rodriguez",
+        email: "carlos.rodriguez@example.com",
+        role: "user",
+        pets: []
+    },
+    {
+        _id: "647fa8c9e46dbc5a20320191",
+        first_name: "Ana",
+        last_name: "Martinez",
+        email: "ana.martinez@example.com",
+        role: "admin",
+        pets: []
+    },
+    {
+        _id: "647fa8c9e46dbc5a20320192",
+        first_name: "Lucas",
+        last_name: "Fernandez",
+        email: "lucas.fernandez@example.com",
+        role: "user",
         pets: []
     }
 ];

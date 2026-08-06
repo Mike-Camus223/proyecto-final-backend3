@@ -4,10 +4,47 @@ import petModel from "./models/Pet.js";
 const samplePets = [
     {
         _id: "647fa8c9e46dbc5a20320182",
-        name: "Firma",
-        specie: "Dog",
+        name: "Firulais",
+        specie: "Perro",
         adopted: false,
-        birthDate: "2022-01-01T00:00:00.000Z"
+        birthDate: "2022-01-15T00:00:00.000Z"
+    },
+    {
+        _id: "647fa8c9e46dbc5a20320184",
+        name: "Michi",
+        specie: "Gato",
+        adopted: false,
+        birthDate: "2023-03-10T00:00:00.000Z"
+    },
+    {
+        _id: "647fa8c9e46dbc5a20320185",
+        name: "Luna",
+        specie: "Gato",
+        adopted: true,
+        owner: "647fa8c9e46dbc5a20320181",
+        birthDate: "2021-06-20T00:00:00.000Z"
+    },
+    {
+        _id: "647fa8c9e46dbc5a20320186",
+        name: "Rocky",
+        specie: "Perro",
+        adopted: false,
+        birthDate: "2020-11-05T00:00:00.000Z"
+    },
+    {
+        _id: "647fa8c9e46dbc5a20320187",
+        name: "Mia",
+        specie: "Gato",
+        adopted: false,
+        birthDate: "2022-08-14T00:00:00.000Z"
+    },
+    {
+        _id: "647fa8c9e46dbc5a20320188",
+        name: "Toby",
+        specie: "Perro",
+        adopted: true,
+        owner: "647fa8c9e46dbc5a20320183",
+        birthDate: "2019-04-30T00:00:00.000Z"
     }
 ];
 
